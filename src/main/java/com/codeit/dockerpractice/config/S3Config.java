@@ -19,41 +19,54 @@ public class S3Config {
   }
 
   @Bean
-  public S3Client s3Client(){
-    if (props.getCredentials().getAccessKey() != null && !props.getCredentials().getAccessKey().isBlank()) {
+  public S3Client s3Client() {
+    Region region = resolveRegion();
+
+    if (props.getCredentials().getAccessKey() != null
+        && !props.getCredentials().getAccessKey().isBlank()) {
       return S3Client.builder()
-          .region(Region.of(props.getRegion()))
+          .region(region)
           .credentialsProvider(
               StaticCredentialsProvider.create(
                   AwsBasicCredentials.create(
                       props.getCredentials().getAccessKey(),
-                      props.getCredentials().getSecretKey()
-                  )
-              )
-          )
+                      props.getCredentials().getSecretKey())))
           .build();
     }
-    // 그렇지 않으면: 기본 체인(환경변수, 프로파일, IAM Role)을 자동 탐색
+
     return S3Client.builder()
-        .region(Region.of(props.getRegion()))
+        .region(region)
         .credentialsProvider(DefaultCredentialsProvider.create())
         .build();
   }
 
   @Bean
-  public S3Presigner s3Presigner(){
-    if(props.getCredentials().getAccessKey() != null && !props.getCredentials().getAccessKey().isBlank()){
+  public S3Presigner s3Presigner() {
+    Region region = resolveRegion();
+
+    if (props.getCredentials().getAccessKey() != null
+        && !props.getCredentials().getAccessKey().isBlank()) {
       return S3Presigner.builder()
-          .region(Region.of(props.getRegion()))
-          .credentialsProvider(StaticCredentialsProvider.create(
-              AwsBasicCredentials.create(
-                  props.getCredentials().getAccessKey(),
-                      props.getCredentials().getSecretKey())
-              )).build();
+          .region(region)
+          .credentialsProvider(
+              StaticCredentialsProvider.create(
+                  AwsBasicCredentials.create(
+                      props.getCredentials().getAccessKey(),
+                      props.getCredentials().getSecretKey())))
+          .build();
     }
+
     return S3Presigner.builder()
-        .region(Region.of(props.getRegion()))
+        .region(region)
         .credentialsProvider(DefaultCredentialsProvider.create())
         .build();
+  }
+
+  private Region resolveRegion() {
+    String configuredRegion = props.getRegion();
+    if (configuredRegion == null || configuredRegion.isBlank()) {
+      return Region.US_EAST_1;
+    }
+    return Region.of(configuredRegion);
   }
 }
