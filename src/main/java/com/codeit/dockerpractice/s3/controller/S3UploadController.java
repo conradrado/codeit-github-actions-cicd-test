@@ -1,5 +1,8 @@
 package com.codeit.dockerpractice.s3.controller;
 
+import com.codeit.dockerpractice.s3.dto.FileMetadataDto;
+import com.codeit.dockerpractice.s3.entity.FileMetadata;
+import com.codeit.dockerpractice.s3.service.FileMetadataService;
 import com.codeit.dockerpractice.s3.service.S3UploadService;
 import java.net.URI;
 import lombok.RequiredArgsConstructor;
@@ -15,11 +18,12 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class S3UploadController {
   private final S3UploadService s3UploadService;
+  private final FileMetadataService fileMetadataService;
 
   @PostMapping("/upload")
   public ResponseEntity upload(@RequestParam ("file") MultipartFile file){
-    com.codeit.dockerpractice.domain.FileMetadata saved = fileMetadataService.uploadAndSave(file);
-    FileMetadata dto = com.codeit.dockerpractice.domain.FileMetadata
+    FileMetadata saved = fileMetadataService.uploadAndSave(file);
+    FileMetadataDto dto = FileMetadataDto.from(saved);
 
     String url = s3UploadService.store(file);
     return ResponseEntity.created(URI.create(url))

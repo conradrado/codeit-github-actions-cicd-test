@@ -1,4 +1,4 @@
-package com.codeit.dockerpractice.image.controller;
+package com.codeit.dockerpractice.s3.controller;
 
 import com.codeit.dockerpractice.s3.dto.FileMetadataDto;
 import com.codeit.dockerpractice.s3.entity.FileMetadata;
