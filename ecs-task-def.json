@@ -1,6 +1,6 @@
 {
   "family": "myapp-task",
-  "networkMode": "bridge",
+  "networkMode": "aws-vpc",
   "containerDefinitions": [
     {
       "name": "myapp",
